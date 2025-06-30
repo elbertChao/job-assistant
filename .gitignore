@@ -1,0 +1,76 @@
+# === Node / Frontend ===
+node_modules/
+.next/
+out/
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# === Python / Backend ===
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+pip-log.txt
+*.log
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+.env.*
+
+# FastAPI specific
+instance/
+*.db
+*.sqlite3
+
+# === Docker ===
+*.pid
+*.seed
+*.tar
+*.bak
+.dockerignore
+docker-compose.override.yml
+
+# === Logs & Misc ===
+*.log
+logs/
+debug.log
+coverage/
+.coverage
+*.cover
+.hypothesis/
+pytest_cache/
+
+# === VSCode / IDEs ===
+.vscode/
+.idea/
+*.swp
+
+# === OS Specific ===
+.DS_Store
+Thumbs.db
+
+# === MongoDB dumps ===
+dump/
+*.bson
+*.gz
+
+# === CI/CD ===
+.github/workflows/secrets.yaml

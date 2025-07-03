@@ -202,6 +202,7 @@ const AutofillJobs: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                       className="input-field"
                       placeholder="Enter company name"
+                      autoComplete='organization-name'
                     />
                   </div>
                   <div>
@@ -215,6 +216,7 @@ const AutofillJobs: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                       className="input-field"
                       placeholder="Enter position title"
+                      autoComplete='job-title'
                     />
                   </div>
                 </div>

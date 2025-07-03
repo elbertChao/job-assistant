@@ -48,7 +48,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false)
 
       // Handle user signup completion
-      if (event === 'SIGNED_UP' && session?.user) {
+      // if (event === 'SIGNED_UP' && session?.user) {
+      if (session?.user) {
         console.log('User signed up, creating profile...')
         // The profile should be created automatically by the database trigger
         // But let's add a small delay to ensure it's processed

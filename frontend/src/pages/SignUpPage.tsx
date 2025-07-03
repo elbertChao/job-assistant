@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { motion } from 'framer-motion'
 import { Mail, Lock, User, Briefcase } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import { createUser } from '../services/api'
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -14,7 +15,7 @@ const signUpSchema = z.object({
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
-  path: ["confirmPassword"],
+  path: ['confirmPassword'],
 })
 
 type SignUpFormData = z.infer<typeof signUpSchema>
@@ -33,16 +34,29 @@ const SignUpPage: React.FC = () => {
   })
 
   const onSubmit = async (data: SignUpFormData) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await signUp(data.email, data.password, data.fullName)
-      navigate('/dashboard')
-    } catch (error) {
-      // Error is handled in the auth context
+      await signUp(data.email, data.password, data.fullName);
+      console.log("User signed up, creating backend profile...");
+
+      const userProfile = await createUser(data.fullName);
+
+      console.log("🧪 createUser() result:", userProfile);
+
+      if (!userProfile) {
+        console.error("❌ createUser() returned null — aborting navigation");
+        return;
+      }
+
+      console.log("✅ Navigation triggered to /dashboard");
+      navigate('/dashboard');
+    } catch (err) {
+      console.error("❌ Sign-up failed:", err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
+
 
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -78,6 +92,7 @@ const SignUpPage: React.FC = () => {
                   type="text"
                   className="input-field pl-10"
                   placeholder="Enter your full name"
+                  autoComplete='name'
                 />
               </div>
               {errors.fullName && (

@@ -5,9 +5,24 @@ const GeneratedAnswer = () => {
   const [jobDescription, setJobDescription] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
 
-  const handleGenerate = () => {
-    // Replace with generateAnswer API later
-    setAnswer(`This is a tailored answer for: ${question}`);
+  const handleGenerate = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/generate/answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: "test_user",
+          question,
+          job_description: jobDescription
+        })
+      });
+
+      const data = await res.json();
+      setAnswer(data.answer);
+    } catch (err) {
+      console.error(err);
+      setAnswer("Failed to generate an answer.");
+    }
   };
 
   return (

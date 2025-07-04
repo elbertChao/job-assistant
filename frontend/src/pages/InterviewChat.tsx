@@ -46,55 +46,56 @@ const InterviewChat: React.FC = () => {
     scrollToBottom()
   }, [messages])
 
-  const generateBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase()
-    
-    // Simple response logic - in a real app, this would use AI
-    if (lowerMessage.includes('strength') || lowerMessage.includes('good at')) {
-      return "That's a great strength! Can you provide a specific example of how this strength helped you succeed in a previous role? Remember to use the STAR method (Situation, Task, Action, Result) when describing your examples."
-    } else if (lowerMessage.includes('weakness') || lowerMessage.includes('improve')) {
-      return "Good self-awareness! The key to answering weakness questions is to show how you're actively working to improve. Can you tell me about the steps you're taking to address this weakness?"
-    } else if (lowerMessage.includes('myself') || lowerMessage.includes('about me')) {
-      return "Nice introduction! A strong 'tell me about yourself' answer should be concise and follow this structure: Present (current role/situation), Past (relevant experience), Future (why you're interested in this role). Would you like to try restructuring your answer using this format?"
-    } else if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
-      return "You're welcome! Let's continue with another common question: " + interviewQuestions[Math.floor(Math.random() * interviewQuestions.length)]
-    } else {
-      // Generate a follow-up question or feedback
-      const responses = [
-        "That's a solid answer! To make it even stronger, try to include specific metrics or results. Here's another question: " + interviewQuestions[Math.floor(Math.random() * interviewQuestions.length)],
-        "Good response! Remember to maintain eye contact and speak confidently during the actual interview. Let's practice another one: " + interviewQuestions[Math.floor(Math.random() * interviewQuestions.length)],
-        "Nice! Your answer shows good self-reflection. For your next response, try to connect your experience more directly to the role you're applying for. Here's another question: " + interviewQuestions[Math.floor(Math.random() * interviewQuestions.length)]
-      ]
-      return responses[Math.floor(Math.random() * responses.length)]
-    }
-  }
-
   const sendMessage = async () => {
-    if (!inputMessage.trim()) return
+    if (!inputMessage.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       content: inputMessage,
       sender: 'user',
       timestamp: new Date()
-    }
+    };
 
-    setMessages(prev => [...prev, userMessage])
-    setInputMessage('')
-    setIsTyping(true)
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(() => {
+    try {
+      const res = await fetch("http://localhost:8000/api/generate/answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: user?.id || "anonymous",
+          question: inputMessage,
+          job_description: "" // add job description here if needed
+        }),
+      });
+
+      const data = await res.json();
+
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: generateBotResponse(inputMessage),
+        content: data.answer,
         sender: 'bot',
         timestamp: new Date()
-      }
-      setMessages(prev => [...prev, botResponse])
-      setIsTyping(false)
-    }, 1500)
-  }
+      };
+
+      setMessages(prev => [...prev, botResponse]);
+    } catch (err) {
+      console.error(err);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          content: "Sorry, I couldn't generate a response at the moment.",
+          sender: 'bot',
+          timestamp: new Date()
+        }
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

@@ -3,18 +3,17 @@ import requests
 from fastapi import APIRouter, Request, Header, HTTPException
 from typing import Optional
 from datetime import datetime
-from dotenv import load_dotenv
 from models import User
 
-# Load .env (SUPABASE_URL & SUPABASE_ANON_KEY)
-load_dotenv()
+router = APIRouter()
 
+# read the vars that main.py already loaded
 SUPABASE_URL = os.getenv("VITE_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("VITE_SUPABASE_ANON_KEY")
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise RuntimeError("SUPABASE_URL and SUPABASE_ANON_KEY must be set in your environment")
 
-router = APIRouter()
+# ensure we have the required environment variables and raise an error if not
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set")
 
 @router.post("/api/users")
 def create_user(

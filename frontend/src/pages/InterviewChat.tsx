@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { Send, MessageSquare, User, Bot, Lightbulb } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { useAuth } from '../contexts/AuthContext'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm   from 'remark-gfm'
 
 interface Message {
   id: string
@@ -171,7 +173,11 @@ const InterviewChat: React.FC = () => {
                             ? 'bg-primary-600 text-white'
                             : 'bg-secondary-100 text-secondary-900'
                         }`}>
-                          <p className="text-sm leading-relaxed">{message.content}</p>
+                          <div className="prose prose-sm">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {message.content}
+                            </ReactMarkdown>
+                          </div>
                           <p className={`text-xs mt-2 ${
                             message.sender === 'user' 
                               ? 'text-primary-100' 
@@ -225,44 +231,47 @@ const InterviewChat: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {/* Tips Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="card">
-                <h3 className="text-lg font-semibold text-secondary-900 mb-4 flex items-center">
-                  <Lightbulb className="h-5 w-5 mr-2 text-yellow-500" />
-                  Interview Tips
-                </h3>
-                <div className="space-y-4 text-sm">
-                  <div className="p-3 bg-primary-50 rounded-lg">
-                    <h4 className="font-medium text-primary-900 mb-1">STAR Method</h4>
-                    <p className="text-primary-700">Structure your answers: Situation, Task, Action, Result</p>
-                  </div>
-                  <div className="p-3 bg-green-50 rounded-lg">
-                    <h4 className="font-medium text-green-900 mb-1">Be Specific</h4>
-                    <p className="text-green-700">Use concrete examples and quantify your achievements</p>
-                  </div>
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <h4 className="font-medium text-blue-900 mb-1">Stay Positive</h4>
-                    <p className="text-blue-700">Frame challenges as learning opportunities</p>
-                  </div>
-                  <div className="p-3 bg-purple-50 rounded-lg">
-                    <h4 className="font-medium text-purple-900 mb-1">Ask Questions</h4>
-                    <p className="text-purple-700">Show interest by asking thoughtful questions</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card mt-6">
-                <h3 className="text-lg font-semibold text-secondary-900 mb-4">
-                  Common Questions
-                </h3>
-                <div className="space-y-2 text-sm">
-                  {interviewQuestions.slice(0, 5).map((question, index) => (
-                    <div key={index} className="p-2 bg-secondary-50 rounded text-secondary-700">
-                      {question}
+            <div className="col-span-full mt-8 card">
+              {/* Tips Sidebar */}
+              <div className="lg:col-span-1">
+                <div className="card lg:col-span-4">
+                  <h3 className="text-lg font-semibold text-secondary-900 mb-4 flex items-center">
+                    <Lightbulb className="h-5 w-5 mr-2 text-yellow-500" />
+                    Interview Tips
+                  </h3>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-6 text-sm items-start">
+                    {/* LEFT COLUMN: your existing 4 tips */}
+                    <div className="space-y-4">
+                      <div className="px-4 py-3 bg-primary-50 rounded-lg">
+                        <h4 className="font-medium text-primary-900 mb-1">STAR Method</h4>
+                        <p className="text-primary-700">Structure your answers: Situation, Task, Action, Result</p>
+                      </div>
+                      <div className="px-4 py-3 bg-primary-50 rounded-lg">
+                        <h4 className="font-medium text-green-900 mb-1">Be Specific</h4>
+                        <p className="text-green-700">Use concrete examples and quantify your achievements</p>
+                      </div>
+                      <div className="px-4 py-3 bg-primary-50 rounded-lg">
+                        <h4 className="font-medium text-blue-900 mb-1">Stay Positive</h4>
+                        <p className="text-blue-700">Frame challenges as learning opportunities</p>
+                      </div>
+                      <div className="px-4 py-3 bg-primary-50 rounded-lg">
+                        <h4 className="font-medium text-purple-900 mb-1">Ask Questions</h4>
+                        <p className="text-purple-700">Show interest by asking thoughtful questions</p>
+                      </div>
                     </div>
-                  ))}
+
+                    {/* RIGHT COLUMN: pull in Common Questions */}
+                    <div>
+                      <h4 className="font-semibold text-secondary-900 mb-4">Common Questions</h4>
+                      <div className='space-y-3'>
+                        {interviewQuestions.slice(0, 5).map((question, index) => (
+                          <div key={index} className="px-3 py-2 bg-secondary-50 rounded-lg text-secondary-700">
+                            {question}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

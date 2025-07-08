@@ -5,7 +5,7 @@ load_dotenv(override=True)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import users, resume, answers
+from routes import users, answers, resumes
 
 app = FastAPI()
 
@@ -20,5 +20,5 @@ app.add_middleware(
 
 # include route modules
 app.include_router(users.router)
-app.include_router(resume.router)
+app.include_router(resumes.router)
 app.include_router(answers.router)

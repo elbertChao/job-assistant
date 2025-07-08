@@ -1,20 +1,21 @@
 from fastapi import Request, HTTPException, status, Depends
 from fastapi.security import HTTPBearer
-from jose import jwt, JWTError
-import os
+from supabase_client import supabase
 
 security = HTTPBearer()
 
-JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
-JWT_ALG = "HS256"  # Supabase default
-
-def verify_jwt_token(request: Request, credentials=Depends(security)):
+def verify_jwt_token(
+    request: Request,
+    credentials=Depends(security),
+):
     token = credentials.credentials
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
-        request.state.user = payload  # Save to request for downstream access
-    except JWTError:
+        # this will call Supabase’s /auth/v1/user endpoint under the hood
+        user_resp = supabase.auth.get_user(token)
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
         )
+    # user_resp.user is the decoded user record
+    request.state.user = user_resp.user  

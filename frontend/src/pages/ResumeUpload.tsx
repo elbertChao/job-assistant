@@ -40,80 +40,70 @@ const ResumeUpload: React.FC = () => {
     }
   }
 
-  const extractTextFromFile = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      
-      reader.onload = async (e) => {
-        const content = e.target?.result as string
-        
-        if (file.type === 'text/plain') {
-          resolve(content)
-        } else if (file.type === 'application/pdf') {
-          // For demo purposes, we'll simulate PDF text extraction
-          // In a real app, you'd use a library like pdf-parse
-          resolve(`[PDF Content] ${file.name}\n\nThis is a simulated extraction of PDF content. In a real application, this would contain the actual text from your PDF resume including your experience, skills, education, and contact information.`)
-        } else if (file.type.includes('word')) {
-          // For demo purposes, we'll simulate Word document text extraction
-          // In a real app, you'd use a library like mammoth
-          resolve(`[Word Document Content] ${file.name}\n\nThis is a simulated extraction of Word document content. In a real application, this would contain the actual text from your Word resume including your experience, skills, education, and contact information.`)
-        } else {
-          reject(new Error('Unsupported file type'))
-        }
-      }
-      
-      reader.onerror = () => reject(new Error('Failed to read file'))
-      reader.readAsText(file)
-    })
-  }
-
   const handleFile = async (file: File) => {
-    const allowedTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/plain'
-    ]
+    console.log("⏩ handleFile started")
 
-    if (!allowedTypes.includes(file.type)) {
-      toast.error('Please upload a PDF, Word document, or text file')
-      return
-    }
-
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      toast.error('File size must be less than 10MB')
+    if (!user) {
+      toast.error("You must be signed in to upload")
       return
     }
 
     setUploading(true)
-    setUploadedFile(file)
+    console.log("Uploading → true")
 
+    // 1️⃣ Refresh the session (this will give you a new access_token)
+    const {
+      data: { session: refreshedSession },
+      error: refreshError
+    } = await supabase.auth.refreshSession()
+
+    if (refreshError || !refreshedSession?.access_token) {
+      console.error("Session refresh failed", refreshError)
+      toast.error("Session refresh failed—please log in again.")
+      setUploading(false)
+      return
+    }
+
+    const token = refreshedSession.access_token
+    console.log("Refreshed token:", token.slice(0,10), "…")
+
+    // 2️⃣ Build the form payload
+    const form = new FormData()
+    form.append("file", file)
+
+    // 3️⃣ POST to your backend
     try {
-      // Extract text from file
-      const text = await extractTextFromFile(file)
-      setExtractedText(text)
+      console.log("→ About to fetch /api/resume/upload")
+      const res = await fetch("http://localhost:8000/api/resume/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: form,
+      })
 
-      // Save to database
-      if (user) {
-        const { error } = await supabase
-          .from('resumes')
-          .insert({
-            user_id: user.id,
-            title: file.name,
-            content: text,
-            file_url: null // In a real app, you'd upload to storage first
-          })
+      console.log("← Fetch returned status", res.status)
 
-        if (error) throw error
-
-        toast.success('Resume uploaded successfully!')
+      if (!res.ok) {
+        const errText = await res.text()
+        console.error("Fetch not ok:", errText)
+        throw new Error(`Upload failed (${res.status}): ${errText}`)
       }
-    } catch (error: any) {
-      console.error('Error uploading resume:', error)
-      toast.error('Failed to upload resume')
+
+      const json = await res.json()
+      console.log("✅ Upload succeeded:", json)
+      
+      // only now flip into “file uploaded” UI
+      setUploadedFile(file)
+      setExtractedText(json.content || `Saved ${json.title} (ID: ${json.id})`)
+      toast.success("Resume uploaded and extracted!")
+    } catch (err: any) {
+      console.error("🚨 Error uploading resume:", err)
+      toast.error(err.message || "Failed to upload resume")
       setUploadedFile(null)
-      setExtractedText('')
+      setExtractedText("")
     } finally {
+      console.log("🔚 handleFile finally; Uploading → false")
       setUploading(false)
     }
   }

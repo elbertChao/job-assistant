@@ -18,3 +18,5 @@ class AnswerRequest(BaseModel):
     user_id: str
     question: str
     job_description: str
+    resume_id: Optional[str]
+    resume_content: Optional[str]

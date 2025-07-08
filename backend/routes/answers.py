@@ -14,8 +14,11 @@ def generate_answer(payload: AnswerRequest):
     logger.info(f"Generating answer for user {payload.user_id} - Question: {payload.question!r}")
 
     instructions = (
-        "You are a helpful interview coach. "
-        "Given the following question and job description, generate a personalized, professional answer."
+        "You are an intelligent interview coach. "
+        "Use the following resume and job description to craft feedback:\n\n"
+        f"RESUME:\n{payload.resume_content}\n\n"
+        f"JOB DESCRIPTION:\n{payload.job_description}\n\n"
+        "When the user asks a question, answer as that coach."
     )
     # combine question & JD into a single input
     user_input = f"Question: {payload.question}\nJob Description: {payload.job_description or 'N/A'}"

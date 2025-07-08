@@ -81,7 +81,7 @@ def list_resumes(user_id: str = Query(...)):
         resp = (
             supabase
               .from_("resumes")
-              .select("id, title")
+              .select("id, title, content")
               .eq("user_id", user_id)
               .execute()
         )

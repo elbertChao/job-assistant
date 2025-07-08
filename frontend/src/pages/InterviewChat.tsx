@@ -19,16 +19,24 @@ const InterviewChat: React.FC = () => {
   const { user } = useAuth()
 
   // Conversation state
-  const [messages, setMessages] = useState<Message[]>([{
-    id: 'init',
-    content: "Hello! I'm your AI interview coach. I'll help you practice common interview questions based on your resume and experience.",
-    sender: 'bot',
-    timestamp: new Date()
-  }])
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      content: "Hello! I'm your AI interview coach. I'll help you practice common interview questions based on your resume and experience.",
+      sender: 'bot',
+      timestamp: new Date()
+    },
+    {
+      id: '2',
+      content: 'Please paste the job description for the role you want to practice for:',
+      sender: 'bot',
+      timestamp: new Date()
+    }
+  ])
   const [step, setStep] = useState<Step>('askJobDesc')
   const [jobDescription, setJobDescription] = useState('')
-  const [resumeList, setResumeList] = useState<{ id: string; title: string }[]>([])
-  const [selectedResume, setSelectedResume] = useState<{ id: string; title: string } | null>(null)
+  const [resumeList, setResumeList] = useState<{ id: string; title: string; content:string }[]>([])
+  const [selectedResume, setSelectedResume] = useState<{ id: string; title: string; content:string } | null>(null)
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -69,11 +77,6 @@ const InterviewChat: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  // On mount, ask for job description
-  useEffect(() => {
-    addBotMessage('Please paste the job description for the role you want to practice for:')
-  }, [])
 
   // Fetch resumes when it's time
   useEffect(() => {
@@ -141,7 +144,8 @@ const InterviewChat: React.FC = () => {
           user_id: user.id,
           question,
           job_description: jobDescription,
-          resume_id: selectedResume?.id
+          resume_id: selectedResume?.id,
+          resume_content:  selectedResume?.content,
         })
       })
       const data = await res.json()

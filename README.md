@@ -119,3 +119,8 @@ Built by Elbert Chao using:
 - FastAPI
 
 - Tailwind CSS
+
+---
+
+## 📄 License
+MIT License. See [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) for details.

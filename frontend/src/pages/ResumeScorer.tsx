@@ -25,6 +25,7 @@ interface ScoreBreakdown {
 const ResumeScorer: React.FC = () => {
   const { user } = useAuth()
   const [resumes, setResumes] = useState<Resume[]>([])
+  const [jdUrl, setJdUrl] = useState<string>("")
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [scoreBreakdown, setScoreBreakdown] = useState<ScoreBreakdown[]>([])
@@ -53,92 +54,41 @@ const ResumeScorer: React.FC = () => {
   }
 
   const analyzeResume = async (resume: Resume) => {
+    if (!jdUrl) {
+      toast.error("Please enter a job description URL first")
+      return
+    }
     setAnalyzing(true)
     setSelectedResume(resume)
 
     try {
-      // Simulate AI analysis - in a real app, this would call an AI service
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // 1) call your FastAPI scoring route
+      const resp = await fetch("http://localhost:8000/api/generate/score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resume_text: resume.content,
+          jd_url: jdUrl
+        })
+      })
+      if (!resp.ok) throw new Error(await resp.text())
+      const { overallScore, breakdown } = await resp.json()
 
-      const mockScoreBreakdown: ScoreBreakdown[] = [
-        {
-          category: 'Contact Information',
-          score: 9,
-          maxScore: 10,
-          feedback: 'Complete contact information provided',
-          suggestions: ['Consider adding LinkedIn profile URL']
-        },
-        {
-          category: 'Professional Summary',
-          score: 7,
-          maxScore: 10,
-          feedback: 'Good summary but could be more impactful',
-          suggestions: [
-            'Include specific achievements with numbers',
-            'Highlight unique value proposition',
-            'Tailor to target role'
-          ]
-        },
-        {
-          category: 'Work Experience',
-          score: 8,
-          maxScore: 10,
-          feedback: 'Strong experience section with good details',
-          suggestions: [
-            'Use more action verbs',
-            'Quantify achievements where possible'
-          ]
-        },
-        {
-          category: 'Skills',
-          score: 6,
-          maxScore: 10,
-          feedback: 'Skills section needs improvement',
-          suggestions: [
-            'Add more relevant technical skills',
-            'Include soft skills',
-            'Organize skills by category'
-          ]
-        },
-        {
-          category: 'Education',
-          score: 8,
-          maxScore: 10,
-          feedback: 'Education section is well-formatted',
-          suggestions: ['Include relevant coursework or projects']
-        },
-        {
-          category: 'Formatting & ATS Compatibility',
-          score: 7,
-          maxScore: 10,
-          feedback: 'Good formatting but some ATS optimization needed',
-          suggestions: [
-            'Use standard section headings',
-            'Avoid complex formatting',
-            'Include relevant keywords'
-          ]
-        }
-      ]
+      // 2) update local state to render
+      setOverallScore(overallScore)
+      setScoreBreakdown(breakdown)
 
-      const totalScore = mockScoreBreakdown.reduce((sum, item) => sum + item.score, 0)
-      const maxTotalScore = mockScoreBreakdown.reduce((sum, item) => sum + item.maxScore, 0)
-      const overallPercentage = Math.round((totalScore / maxTotalScore) * 100)
-
-      setScoreBreakdown(mockScoreBreakdown)
-      setOverallScore(overallPercentage)
-
-      // Update resume score in database
+      // 3) persist score back into Supabase
       const { error } = await supabase
-        .from('resumes')
-        .update({ score: overallPercentage })
-        .eq('id', resume.id)
-
+        .from("resumes")
+        .update({ score: overallScore })
+        .eq("id", resume.id)
       if (error) throw error
 
-      toast.success('Resume analysis completed!')
-    } catch (error) {
-      console.error('Error analyzing resume:', error)
-      toast.error('Failed to analyze resume')
+      toast.success("✅ Resume analysis complete!")
+    } catch (err: any) {
+      console.error(err)
+      toast.error("Failed to analyze resume")
     } finally {
       setAnalyzing(false)
     }
@@ -175,6 +125,15 @@ const ResumeScorer: React.FC = () => {
             {/* Resume Selection */}
             <div className="lg:col-span-1">
               <div className="card">
+                <div className="mb-4">
+                  <input
+                    type="url"
+                    placeholder="Enter job description URL"
+                    value={jdUrl}
+                    onChange={e => setJdUrl(e.target.value)}
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                </div>
                 <h2 className="text-xl font-semibold text-secondary-900 mb-4">Your Resumes</h2>
                 {resumes.length === 0 ? (
                   <div className="text-center py-8">

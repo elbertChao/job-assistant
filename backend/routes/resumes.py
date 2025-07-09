@@ -9,13 +9,13 @@ from supabase_client import supabase  # Supabase client
 import io
 from PyPDF2 import PdfReader
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 def extract_pdf_text(data: bytes) -> str:
     reader = PdfReader(io.BytesIO(data))
     return "\n\n".join(page.extract_text() or "" for page in reader.pages)
 
-@router.post("/api/resume/upload")
+@router.post("/resume/upload")
 async def upload_resume(
     request: Request,
     file: UploadFile = File(...),
@@ -57,25 +57,7 @@ async def upload_resume(
     new_row = resp.data[0]
     return {"id": new_row["id"], "title": new_row["title"]}
 
-@router.post("/api/resume/analyze")
-def analyze_resume(
-    data: ResumeData,
-    request: Request,
-    _=Depends(verify_jwt_token),  # require valid JWT
-):
-    user = request.state.user  # Set in verify_jwt_token
-    user_id = user["sub"]  # Supabase Auth UID (subject claim)
-
-    logger.info(f"Analyzing resume for user {user_id}")
-    
-    # use user_id for logging or DB ops
-
-    return {
-        "score": 85,
-        "feedback": "Good alignment with job requirements.",
-    }
-
-@router.get("/api/resumes")
+@router.get("/resumes")
 def list_resumes(user_id: str = Query(...)):
     try:
         resp = (

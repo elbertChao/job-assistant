@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
 
 class User(BaseModel):
@@ -20,3 +20,18 @@ class AnswerRequest(BaseModel):
     job_description: str
     resume_id: Optional[str]
     resume_content: Optional[str]
+
+class ScoreRequest(BaseModel):
+    resume_text: str
+    jd_url: str
+
+class BreakdownItem(BaseModel):
+    category: str
+    score: int
+    maxScore: int
+    feedback: str
+    suggestions: List[str]
+
+class ScoreResponse(BaseModel):
+    overallScore: int
+    breakdown: List[BreakdownItem]

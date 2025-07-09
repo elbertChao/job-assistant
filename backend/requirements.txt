@@ -9,3 +9,9 @@ requests
 openai
 PyPDF2==3.0.1
 python-multipart
+selenium
+undetected-chromedriver
+webdriver-manager
+newspaper3k
+readability-lxml
+goose3

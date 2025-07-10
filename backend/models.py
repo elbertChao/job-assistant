@@ -35,3 +35,4 @@ class BreakdownItem(BaseModel):
 class ScoreResponse(BaseModel):
     overallScore: int
     breakdown: List[BreakdownItem]
+    jdText: Optional[str]

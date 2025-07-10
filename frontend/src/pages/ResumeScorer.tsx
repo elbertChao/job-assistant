@@ -26,6 +26,8 @@ const ResumeScorer: React.FC = () => {
   const { user } = useAuth()
   const [resumes, setResumes] = useState<Resume[]>([])
   const [jdUrl, setJdUrl] = useState<string>("")
+  const [jdText, setJdText] = useState<string | null>(null);
+  const [resumeText, setResumeText] = useState<string | null>(null);
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [scoreBreakdown, setScoreBreakdown] = useState<ScoreBreakdown[]>([])
@@ -72,11 +74,13 @@ const ResumeScorer: React.FC = () => {
         })
       })
       if (!resp.ok) throw new Error(await resp.text())
-      const { overallScore, breakdown } = await resp.json()
+      const { overallScore, breakdown, jdText } = await resp.json()
 
       // 2) update local state to render
       setOverallScore(overallScore)
       setScoreBreakdown(breakdown)
+      setResumeText(resume.content)
+      setJdText(jdText)
 
       // 3) persist score back into Supabase
       const { error } = await supabase
@@ -104,6 +108,53 @@ const ResumeScorer: React.FC = () => {
     if (score >= 80) return 'bg-green-100'
     if (score >= 60) return 'bg-yellow-100'
     return 'bg-red-100'
+  }
+
+  // ——— Download Report Handler ———
+  const handleDownloadReport = () => {
+    if (!selectedResume) return
+
+    const lines: string[] = []
+    lines.push(`Job Description URL: ${jdUrl}`)
+    lines.push(``)
+    lines.push(`--- Extracted Job Description ---`)
+    lines.push(jdText || "")
+    lines.push(``)
+    lines.push(`--- Resume Content (${selectedResume.title}) ---`)
+    lines.push(resumeText || selectedResume.content)
+    lines.push(``)
+    lines.push(`Overall Score: ${overallScore}%`)
+    lines.push(``)
+    lines.push(`--- Breakdown ---`)
+    scoreBreakdown.forEach(item => {
+      lines.push(`${item.category}: ${item.score}/${item.maxScore}`)
+      lines.push(`  Feedback: ${item.feedback}`)
+      if (item.suggestions.length) {
+        lines.push(`  Suggestions:`)
+        item.suggestions.forEach(s => lines.push(`    • ${s}`))
+      }
+      lines.push(``)
+    })
+
+    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${selectedResume.title.replace(/\s+/g, "_")}_report.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  // ——— Analyze Another Resume Handler ———
+  const handleAnalyzeAnother = () => {
+    setSelectedResume(null)
+    setScoreBreakdown([])
+    setOverallScore(0)
+    setJdUrl("")
+    setJdText(null)
+    setResumeText(null)
   }
 
   return (
@@ -260,12 +311,36 @@ const ResumeScorer: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* JD + Resume Content Display */}
+                  <div className="card">
+                    <h3 className="text-xl font-semibold text-secondary-900 mb-4">
+                      Job Description Extracted
+                    </h3>
+                    <div className="bg-secondary-50 text-sm text-secondary-800 p-4 rounded max-h-60 overflow-y-scroll whitespace-pre-wrap border border-secondary-200">
+                      {jdText || "No job description text extracted."}
+                    </div>
+
+                    <h3 className="text-xl font-semibold text-secondary-900 mb-4 mt-6">
+                      Resume Content Used
+                    </h3>
+                    <div className="bg-secondary-50 text-sm text-secondary-800 p-4 rounded max-h-60 overflow-y-scroll whitespace-pre-wrap border border-secondary-200">
+                      {resumeText || "No resume content available."}
+                    </div>
+                  </div>
+
                   {/* Action Buttons */}
                   <div className="flex space-x-4">
-                    <button className="btn-primary">
+                    <button
+                      onClick={handleDownloadReport}
+                      className="btn-primary"
+                      disabled={!selectedResume}
+                    >
                       Download Report
                     </button>
-                    <button className="btn-secondary">
+                    <button
+                      onClick={handleAnalyzeAnother}
+                      className="btn-secondary"
+                    >
                       Analyze Another Resume
                     </button>
                   </div>

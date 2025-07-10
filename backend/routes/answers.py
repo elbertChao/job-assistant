@@ -88,5 +88,6 @@ def generate_score(payload: ScoreRequest):
 
     return {
         "overallScore": parsed["overallScore"],
-        "breakdown": parsed["breakdown"]
+        "breakdown": parsed["breakdown"],
+        "jdText": jd_text,
     }

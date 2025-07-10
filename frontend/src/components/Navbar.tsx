@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { LogOut, User, Briefcase } from 'lucide-react'
+import { LogOut, User, } from 'lucide-react'
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuth()
@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to={user ? "/dashboard" : "/"} className="flex items-center space-x-2">
-            <Briefcase className="h-8 w-8 text-primary-600" />
+            <img src="/logo.png" alt="JobAssist Logo" className="w-10 h-10" />
             <span className="text-xl font-bold text-secondary-900">JobAssist</span>
           </Link>
 

@@ -115,6 +115,7 @@ def extract_with_tools(url):
                 text = block.get_text().strip()
                 if 'job' in text.lower() and len(text) > 300:
                     print("↪ raw-HTML job block matched")
+                    print("↪ [debug] extracted page_text snippet:\n", text[:2000]) # FOR DEBUGGING
                     return text
         # **catch-all** 
         page_text = soup.get_text(separator='\n').strip()

@@ -231,11 +231,11 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <Briefcase className="h-8 w-8 text-primary-400" />
+              <img src="/logo.png" alt="JobAssist Logo" className="w-10 h-10" />
               <span className="text-xl font-bold">JobAssist</span>
             </div>
             <p className="text-secondary-400 text-center md:text-right">
-              © 2025 JobAssist. All rights reserved. Built with ❤️ for job seekers.
+              © 2025 JobAssist. All rights reserved. Built by Elbert Chao for job seekers.
             </p>
           </div>
         </div>

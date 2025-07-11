@@ -18,10 +18,13 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+# read the FRONTEND_ORIGIN env‐var (set in Render’s Dashboard)
+frontend_origin = os.environ.get("FRONTEND_ORIGIN")  
+
 # You’ll set FRONTEND_ORIGIN=https://<your-vercel-url> (or * to allow all) on Render
 app.add_middleware(
   CORSMiddleware,
-  allow_origins=[os.environ.get("FRONTEND_ORIGIN", "*")],
+  allow_origins=[frontend_origin] if frontend_origin else ["*"],
   allow_credentials=True,
   allow_methods=["*"],
   allow_headers=["*"],

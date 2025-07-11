@@ -3,6 +3,7 @@
 LIVE DEMO (Current Completed Version): https://www.loom.com/share/bd6cdfecaded4dcd8349b41b304744d8?sid=960eb653-27a9-4e89-b6ac-789fa8618c5f
 LIVE DEPLOYMENT LINK: https://job-assistant-frontend.onrender.com/
 (Please be aware I am using my own personal paid OpenAI API key, be nice :) pls...)
+
 An intelligent job application tool that helps users tailor their resumes and generate interview answers based on real job descriptions. This project uses a modern web stack (React, TypeScript, Tailwind CSS, FastAPI, Supabase, OpenAI) to simplify and optimize the job-hunting process.
 
 ---

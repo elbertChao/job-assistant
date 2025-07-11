@@ -9,17 +9,15 @@ from routes import users, answers, resumes
 
 app = FastAPI()
 
-# USE FOR LOCAL DEVELOPMENT
-# enable CORS so frontend can talk to backend
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["http://localhost:5173"],  # allow frontend origin
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+@app.get("/", include_in_schema=False)
+async def root():
+    return {"status": "ok"}
 
-# USE FOR PRODUCTION
+# (optionally a dedicated health route)
+@app.get("/health", include_in_schema=False)
+async def health():
+    return {"status": "healthy"}
+
 # You’ll set FRONTEND_ORIGIN=https://<your-vercel-url> (or * to allow all) on Render
 app.add_middleware(
   CORSMiddleware,

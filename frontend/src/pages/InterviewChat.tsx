@@ -81,7 +81,7 @@ const InterviewChat: React.FC = () => {
   // Fetch resumes when it's time
   useEffect(() => {
   if (step === 'askResume' && user?.id) {
-    fetch(`http://localhost:8000/api/resumes?user_id=${user.id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/resumes?user_id=${user.id}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.json()
@@ -137,7 +137,7 @@ const InterviewChat: React.FC = () => {
     setIsTyping(true)
 
     try {
-      const res = await fetch(`http://localhost:8000/api/generate/answer`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/generate/answer`, {
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
         body: JSON.stringify({

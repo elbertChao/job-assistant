@@ -1,6 +1,8 @@
 import { supabase } from "../lib/supabase";
 
-const API_BASE = "http://localhost:8000/api";
+// const API_BASE = "http://localhost:8000/api";
+
+const API_BASE = import.meta.env.VITE_API_URL
 
 // Unified fetch utility with token
 export const fetchWithToken = async (url: string, options: RequestInit = {}) => {

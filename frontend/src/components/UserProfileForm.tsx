@@ -10,7 +10,7 @@ const UserProfileForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetchWithToken("http://localhost:8000/api/users", {
+      const response = await fetchWithToken(`${import.meta.env.VITE_API_URL}/generate/answer`, {
         method: "POST",
         body: JSON.stringify({
           full_name: fullName,

@@ -7,6 +7,9 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', '@supabase/supabase-js']
   },
+  define: {
+    'process.env': {}
+  },
   server: {
     port: 5173,
     host: true

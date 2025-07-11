@@ -74,7 +74,7 @@ const ResumeUpload: React.FC = () => {
     // 3️⃣ POST to your backend
     try {
       console.log("→ About to fetch /api/resume/upload")
-      const res = await fetch("http://localhost:8000/api/resume/upload", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/resume/upload`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

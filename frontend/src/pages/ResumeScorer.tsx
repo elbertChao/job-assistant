@@ -65,7 +65,7 @@ const ResumeScorer: React.FC = () => {
 
     try {
       // 1) call your FastAPI scoring route
-      const resp = await fetch("http://localhost:8000/api/generate/score", {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/generate/score`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

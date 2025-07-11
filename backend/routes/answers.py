@@ -18,7 +18,7 @@ def generate_answer(payload: AnswerRequest):
     instructions = (
         "You are an intelligent interview coach. "
         "Use the following resume and job description to craft feedback:\n\n"
-        f"RESUME:\n{payload.resume_text}\n\n"
+        f"RESUME:\n{payload.resume_content}\n\n"
         f"JOB DESCRIPTION:\n{payload.job_description}\n\n"
         "When the user asks a question, answer as that coach."
     )

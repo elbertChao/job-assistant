@@ -63,9 +63,12 @@ The frontend runs at http://localhost:5173
 
 ---
 
-### 3. Install Backend
+### 3. Create a virtual environment (venv) & Install Backend Packages
+Note: this is an example performed in Windows, Linux/Apple users may have different venv commands
 ```
 cd ../backend
+python -m venv venv
+venv/Scripts/activate
 pip install -r requirements.txt
 ```
 Create a .env file in backend/ with:
